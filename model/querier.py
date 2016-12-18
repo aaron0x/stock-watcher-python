@@ -1,4 +1,3 @@
-import requests
 import json
 
 
@@ -14,19 +13,13 @@ class Stock(object):
             return False
 
 
-class RequestFactory(object):
-    def create_request(self):
-        return requests
-
-
 class PriceQuerier(object):
-    def __init__(self, request_factory):
-        self.request_factory = request_factory
+    def __init__(self, request):
+        self.request = request
 
     def query(self, stock_numbers):
         url = self._compose_url(stock_numbers)
-        request = self.request_factory.create_request()
-        response =  request.get(url)
+        response =  self.request.get(url)
         return self._handle_response(response, stock_numbers)
 
     def _compose_url(self, stock_numbers):

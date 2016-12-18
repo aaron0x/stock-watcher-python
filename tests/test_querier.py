@@ -67,7 +67,7 @@ class PriceQuerierTestCase(unittest.TestCase):
         FakeResponse.status_code = status_code
         FakeResponse.response = response
 
-        pq = PriceQuerier(FakeRequestFactory())
+        pq = PriceQuerier(FakeRequest())
         stocks = pq.query(['1565.TWO', '2727.TW'])
         self.assertEqual(FakeRequest.url, 'https://query.yahooapis.com/v1/public/yql?q=select LastTradePriceOnly from yahoo.finance.quote where symbol in ("1565.TWO","2727.TW")&format=json&env=store://datatables.org/alltableswithkeys&callback=')
         self.assertEqual(stocks, expected_stocks)
@@ -75,13 +75,13 @@ class PriceQuerierTestCase(unittest.TestCase):
     def test_query_failed(self):
         FakeResponse.status_code = 500
 
-        pq = PriceQuerier(FakeRequestFactory())
+        pq = PriceQuerier(FakeRequest())
         stocks = pq.query(['1565.TWO', '2727.TW'])
         self.assertEqual(len(stocks), 0)
 
         FakeResponse.status_code = 200
         FakeResponse.response = error_response
 
-        pq = PriceQuerier(FakeRequestFactory())
+        pq = PriceQuerier(FakeRequest())
         stocks = pq.query(['1565.TWO', '2727.TW'])
         self.assertEqual(len(stocks), 0)
