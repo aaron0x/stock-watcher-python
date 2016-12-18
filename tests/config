@@ -5,3 +5,6 @@ low=0.1
 [2727.TW]
 high=88
 low=10
+
+[Notification]
+mails=aaron1126@gmail.com,silver@yahoo.com

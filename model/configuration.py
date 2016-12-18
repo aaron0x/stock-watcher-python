@@ -5,14 +5,17 @@ class WatchConfigParser(object):
     def read(self, path):
         config_parser = ConfigParser()
         config_parser.read(path)
+
+        self.mails = config_parser.get('Notification', 'mails').split(',')
+        config_parser.remove_section('Notification')
+
         sections = config_parser.sections()
-        conditions = []
+        self.watch_conditions = []
         for s in sections:
             num = s
-            low = config_parser.getfloat(s, "low")
-            high = config_parser.getfloat(s, "high")
-            conditions.append(WatchCondition(num, low, high))
-        return conditions
+            low = config_parser.getfloat(s, 'low')
+            high = config_parser.getfloat(s, 'high')
+            self.watch_conditions.append(WatchCondition(num, low, high))
 
 
 class WatchCondition(object):
