@@ -19,11 +19,11 @@ class PriceQuerier(object):
 
     def query(self, stock_numbers):
         url = self._compose_url(stock_numbers)
-        response =  self.request.get(url)
+        response = self.request.get(url)
         return self._handle_response(response, stock_numbers)
 
     def _compose_url(self, stock_numbers):
-        quoted_stock_numbers = [ '"{0}"'.format(n) for n in stock_numbers ]
+        quoted_stock_numbers = ['"{0}"'.format(n) for n in stock_numbers]
         number_str = '({0})'.format(','.join(quoted_stock_numbers))
         url = 'https://query.yahooapis.com/v1/public/yql?q=select LastTradePriceOnly from yahoo.finance.quote where symbol in {0}&format=json&env=store://datatables.org/alltableswithkeys&callback='.format(number_str)
         return url
