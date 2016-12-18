@@ -2,6 +2,10 @@ from ConfigParser import ConfigParser
 
 
 class WatchConfigParser(object):
+    def __init__(self):
+        self.mails = []
+        self.watch_conditions = []
+
     def read(self, path):
         config_parser = ConfigParser()
         config_parser.read(path)
@@ -10,7 +14,6 @@ class WatchConfigParser(object):
         config_parser.remove_section('Notification')
 
         sections = config_parser.sections()
-        self.watch_conditions = []
         for s in sections:
             num = s
             low = config_parser.getfloat(s, 'low')
