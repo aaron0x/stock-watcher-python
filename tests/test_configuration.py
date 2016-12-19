@@ -2,6 +2,7 @@ import unittest
 
 from model.configuration import WatchCondition
 from model.configuration import WatchConfigParser
+from model.configuration import SMTPSetting
 
 
 class WatchConfigParserTestCase(unittest.TestCase):
@@ -10,9 +11,11 @@ class WatchConfigParserTestCase(unittest.TestCase):
         wc2 = WatchCondition('2727.TW', 10.0, 88.0)
         expected_wcs = [wc1, wc2]
         expected_mails = ['aaron1126@gmail.com', 'silver@yahoo.com']
+        expected_smtp_setting = SMTPSetting('smtp.gmail.com:587', 'aaron', 'TWRocks', 'aaron@gmail.com', 'Stock Watcher')
 
         wcp = WatchConfigParser()
         wcp.read("./config")
 
         self.assertEqual(wcp.watch_conditions, expected_wcs)
-        self.assertEqual(wcp.mails, expected_mails)
+        self.assertEqual(wcp.to_addrs, expected_mails)
+        self.assertEqual(wcp.smtp_setting, expected_smtp_setting)

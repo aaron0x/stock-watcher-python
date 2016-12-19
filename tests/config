@@ -7,4 +7,11 @@ high=88
 low=10
 
 [Notification]
-mails=aaron1126@gmail.com,silver@yahoo.com
+address=aaron1126@gmail.com,silver@yahoo.com
+
+[SMTP]
+from=aaron@gmail.com
+server=smtp.gmail.com:587
+user=aaron
+password=TWRocks
+subject=Stock Watcher

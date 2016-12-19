@@ -12,7 +12,7 @@ class Watcher(object):
         conditionalStocks = [_ConditionalStock(ws[0], ws[1]) for ws in zip(watched_conditions, stocks)]
         out_of_range_conditionalStocks = [c for c in conditionalStocks if c.out_of_range()]
         message = self._to_message(out_of_range_conditionalStocks)
-        self.notifier.notify(self.watch_config_parser, message)
+        self.notifier.notify(self.watch_config_parser.smtp_setting, self.watch_config_parser.to_addrs, message)
 
     def _is_out_of_price(self, condition_stock):
         condition = condition_stock[0]
