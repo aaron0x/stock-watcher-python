@@ -14,10 +14,20 @@ class Stock(object):
         else:
             return False
 
+    def __str__(self):
+        return '({},{})'.format(self.number, self.current_price)
+
 
 class PriceQuerier(object):
     def __init__(self, request):
         self.request = request
+
+    def query(self, stock_numbers):
+        url = self._compose_url(stock_numbers)
+        response = self.request.get(url)
+        if response.status_code != 200:
+            return []
+        return self._handle_response(response.json(), stock_numbers)
 
     @inlineCallbacks
     def query_async(self, stock_numbers):

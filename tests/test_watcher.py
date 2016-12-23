@@ -17,7 +17,7 @@ class WatcherTestCase(unittest.TestCase):
         wc1 = WatchCondition('1565.TWO', 0.1, 123.4)
         wc2 = WatchCondition('2727.TW', 10.0, 88.0)
         watch_config_parser = Mock(watch_conditions = [wc1, wc2], smtp_setting = expected_smtp_setting, to_addrs = expected_to_adds)
-        attrs = {'query_async.return_value' : [Stock('1565.TWO', 150), Stock('2727.TW', 50.9)]}
+        attrs = {'query.return_value' : [Stock('1565.TWO', 150), Stock('2727.TW', 50.9)]}
         price_querier = Mock(**attrs)
         notifier = MagicMock()
 
