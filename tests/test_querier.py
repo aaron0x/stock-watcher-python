@@ -1,5 +1,6 @@
 import unittest
-import requests
+import treq
+import json
 from mock import MagicMock
 
 from model.querier import Stock
@@ -46,39 +47,53 @@ class FakeResponse(object):
     response = response
 
     @property
-    def status_code(self):
+    def code(self):
         return FakeResponse.status_code
 
-    @property
-    def text(self):
-        return FakeResponse.response
+    def json(self):
+        return json.loads(FakeResponse.response)
 
 
 class PriceQuerierTestCase(unittest.TestCase):
     def setUp(self):
-        requests.get = MagicMock(return_value = FakeResponse())
+        self.org_get = treq.get
+        treq.get = MagicMock(return_value = FakeResponse())
 
+    def tearDown(self):
+        treq.get = self.org_get
 
     def test_query(self):
         expected_stocks = [Stock('1565.TWO', 150), Stock('2727.TW', 90.9)]
         FakeResponse.status_code = status_code
         FakeResponse.response = response
 
-        pq = PriceQuerier(requests)
-        stocks = pq.query(['1565.TWO', '2727.TW'])
-        requests.get.assert_called_with('https://query.yahooapis.com/v1/public/yql?q=select LastTradePriceOnly from yahoo.finance.quote where symbol in ("1565.TWO","2727.TW")&format=json&env=store://datatables.org/alltableswithkeys&callback=')
-        self.assertEqual(stocks, expected_stocks)
+        pq = PriceQuerier(treq)
+        d = pq.query_async(['1565.TWO', '2727.TW'])
+        treq.get.assert_called_with('https://query.yahooapis.com/v1/public/yql?q=select%20LastTradePriceOnly%20from%20yahoo.finance.quote%20where%20symbol%20in%20(%221565.TWO%22%2C%222727.TW%22)&format=json&env=store%3A//datatables.org/alltableswithkeys&callback=')
+        self.assertEqual(d.result, expected_stocks)
 
     def test_query_failed(self):
         FakeResponse.status_code = 500
 
-        pq = PriceQuerier(requests)
-        stocks = pq.query(['1565.TWO', '2727.TW'])
-        self.assertEqual(len(stocks), 0)
+        pq = PriceQuerier(treq)
+        d = pq.query_async(['1565.TWO', '2727.TW'])
+        self.assertEqual(len(d.result), 0)
 
         FakeResponse.status_code = 200
         FakeResponse.response = error_response
 
-        pq = PriceQuerier(requests)
-        stocks = pq.query(['1565.TWO', '2727.TW'])
-        self.assertEqual(len(stocks), 0)
+        pq = PriceQuerier(treq)
+        d = pq.query_async(['1565.TWO', '2727.TW'])
+        self.assertEqual(len(d.result), 0)
+
+
+class PriceQuerierTestCase1(unittest.TestCase):
+    def test_real_query(self):
+        from twisted.internet import reactor
+
+        pq = PriceQuerier(treq)
+        r = pq.query_async(['1565.TWO', '2727.TW'])
+        reactor.callLater(2, reactor.stop)
+        reactor.run()
+        print r
+

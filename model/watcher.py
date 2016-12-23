@@ -8,7 +8,7 @@ class Watcher(object):
         self.watch_config_parser.read(config_path)
         watched_conditions = self.watch_config_parser.watch_conditions
         watched_numbers = [c.number for c in watched_conditions]
-        stocks = self.price_querier.query(watched_numbers)
+        stocks = self.price_querier.query_async(watched_numbers)
         conditionalStocks = [_ConditionalStock(ws[0], ws[1]) for ws in zip(watched_conditions, stocks)]
         out_of_range_conditionalStocks = [c for c in conditionalStocks if c.out_of_range()]
         message = self._to_message(out_of_range_conditionalStocks)

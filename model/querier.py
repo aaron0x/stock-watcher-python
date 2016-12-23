@@ -1,4 +1,6 @@
-import json
+import urllib
+
+from twisted.internet.defer import inlineCallbacks, returnValue
 
 
 class Stock(object):
@@ -17,24 +19,27 @@ class PriceQuerier(object):
     def __init__(self, request):
         self.request = request
 
-    def query(self, stock_numbers):
+    @inlineCallbacks
+    def query_async(self, stock_numbers):
         url = self._compose_url(stock_numbers)
-        response = self.request.get(url)
-        return self._handle_response(response, stock_numbers)
+        r = yield self.request.get(url)
+        if r.code != 200:
+            returnValue([])
+        response = yield r.json()
+        returnValue(self._handle_response(response, stock_numbers))
 
     def _compose_url(self, stock_numbers):
-        quoted_stock_numbers = ['"{0}"'.format(n) for n in stock_numbers]
-        number_str = '({0})'.format(','.join(quoted_stock_numbers))
-        url = 'https://query.yahooapis.com/v1/public/yql?q=select LastTradePriceOnly from yahoo.finance.quote where symbol in {0}&format=json&env=store://datatables.org/alltableswithkeys&callback='.format(number_str)
+        quoted_stock_numbers = ['"{}"'.format(n) for n in stock_numbers]
+        number_str = '({})'.format(','.join(quoted_stock_numbers))
+        select_str = 'select LastTradePriceOnly from yahoo.finance.quote where symbol in {}&format=json&env=store://datatables.org/alltableswithkeys&callback='.format(number_str)
+        escaped_str = urllib.quote(select_str, '/()&=')
+        url = 'https://query.yahooapis.com/v1/public/yql?q={}'.format(escaped_str)
         return url
 
     def _handle_response(self, response, stock_numbers):
-        if response.status_code != 200:
+        if response['query']['count'] != len(stock_numbers):
             return []
-        response_json = json.loads(response.text)
-        if response_json['query']['count'] != len(stock_numbers):
-            return []
-        quote = response_json['query']['results']['quote']
+        quote = response['query']['results']['quote']
         stocks = []
         for i, q in enumerate(quote):
             number = stock_numbers[i]
