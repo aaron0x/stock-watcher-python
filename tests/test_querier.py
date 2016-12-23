@@ -87,13 +87,13 @@ class PriceQuerierTestCase(unittest.TestCase):
         self.assertEqual(len(d.result), 0)
 
 
-class PriceQuerierTestCase1(unittest.TestCase):
-    def test_real_query(self):
-        from twisted.internet import reactor
-
-        pq = PriceQuerier(treq)
-        r = pq.query_async(['1565.TWO', '2727.TW'])
-        reactor.callLater(2, reactor.stop)
-        reactor.run()
-        print r
+# class PriceQuerierTestCase1(unittest.TestCase):
+#     def test_real_query(self):
+#         from twisted.internet import reactor
+#
+#         pq = PriceQuerier(treq)
+#         r = pq.query_async(['1565.TWO', '2727.TW'])
+#         reactor.callLater(2, reactor.stop)
+#         reactor.run()
+#         print r
 
