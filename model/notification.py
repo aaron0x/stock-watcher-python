@@ -1,10 +1,13 @@
 from email.mime.text import MIMEText
 
+from retrying import retry
+
 
 class Notifier(object):
     def __init__(self, smtp):
         self.smtp = smtp
 
+    @retry(stop_max_attempt_number=3, wait_fixed=3000)
     def notify(self, smtp_setting, to_addrs, message):
         msg = MIMEText(message)
         msg['From'] = smtp_setting.from_addr

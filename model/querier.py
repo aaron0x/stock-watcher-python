@@ -1,5 +1,6 @@
 import urllib
 
+from retrying import retry
 from twisted.internet.defer import inlineCallbacks, returnValue
 
 
@@ -22,6 +23,7 @@ class PriceQuerier(object):
     def __init__(self, request):
         self.request = request
 
+    @retry(stop_max_attempt_number=3, wait_fixed=3000)
     def query(self, stock_numbers, timeout):
         url = self._compose_url(stock_numbers)
         response = self.request.get(url, timeout=timeout)
