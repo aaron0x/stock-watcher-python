@@ -23,6 +23,6 @@ class WatcherTestCase(unittest.TestCase):
 
 
         w = Watcher(watch_config_parser, price_querier, notifier)
-        w.watch('./config')
+        w.watch()
 
         notifier.notify.assert_called_with(expected_smtp_setting ,expected_to_adds, expected_message)

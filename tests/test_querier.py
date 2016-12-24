@@ -44,7 +44,7 @@ error_response = '{ \
 
 class FakeResponse(object):
     status_code = 200
-    successful_response = successful_response
+    response = successful_response
 
     @property
     def code(self):

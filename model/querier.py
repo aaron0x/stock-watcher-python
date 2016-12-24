@@ -24,21 +24,22 @@ class PriceQuerier(object):
 
     def query(self, stock_numbers, timeout):
         url = self._compose_url(stock_numbers)
-        response = self.request.get(url, timeout = timeout)
+        response = self.request.get(url, timeout=timeout)
         if response.status_code != 200:
             return []
-        return self._handle_response(response.json(), stock_numbers)
+        return PriceQuerier._handle_response(stock_numbers, response.json())
 
     @inlineCallbacks
     def query_async(self, stock_numbers, timeout):
-        url = self._compose_url(stock_numbers)
-        r = yield self.request.get(url, timeout = timeout)
+        url = PriceQuerier._compose_url(stock_numbers)
+        r = yield self.request.get(url, timeout=timeout)
         if r.code != 200:
             returnValue([])
         response = yield r.json()
-        returnValue(self._handle_response(response, stock_numbers))
+        returnValue(self._handle_response(stock_numbers, response))
 
-    def _compose_url(self, stock_numbers):
+    @staticmethod
+    def _compose_url(stock_numbers):
         quoted_stock_numbers = ['"{}"'.format(n) for n in stock_numbers]
         number_str = '({})'.format(','.join(quoted_stock_numbers))
         select_str = 'select LastTradePriceOnly from yahoo.finance.quote where symbol in {}&format=json&env=store://datatables.org/alltableswithkeys&callback='.format(number_str)
@@ -46,7 +47,8 @@ class PriceQuerier(object):
         url = 'https://query.yahooapis.com/v1/public/yql?q={}'.format(escaped_str)
         return url
 
-    def _handle_response(self, response, stock_numbers):
+    @staticmethod
+    def _handle_response(stock_numbers, response):
         if response['query']['count'] != len(stock_numbers):
             return []
         quote = response['query']['results']['quote']

@@ -1,9 +1,9 @@
 from email.mime.text import MIMEText
 
+
 class Notifier(object):
     def __init__(self, smtp):
         self.smtp = smtp
-
 
     def notify(self, smtp_setting, to_addrs, message):
         msg = MIMEText(message)

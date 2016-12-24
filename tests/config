@@ -18,3 +18,9 @@ subject=Stock Watcher
 
 [Query]
 timeout=3
+
+[Log]
+level=ERROR
+path=/home
+max_size=102400
+backup_num=2

@@ -4,8 +4,7 @@ class Watcher(object):
         self.price_querier = price_querier
         self.notifier = notifier
 
-    def watch(self, config_path):
-        self.watch_config_parser.read(config_path)
+    def watch(self):
         watched_conditions = self.watch_config_parser.watch_conditions
         if not watched_conditions:
             return
@@ -15,23 +14,19 @@ class Watcher(object):
         if not stocks:
             return
 
-        conditionalStocks = [_ConditionalStock(ws[0], ws[1]) for ws in zip(watched_conditions, stocks)]
-        out_of_range_conditionalStocks = [c for c in conditionalStocks if c.out_of_range()]
-        if not out_of_range_conditionalStocks:
+        conditional_stocks = [_ConditionalStock(ws[0], ws[1]) for ws in zip(watched_conditions, stocks)]
+        out_of_range_conditional_stocks = [c for c in conditional_stocks if c.out_of_range()]
+        if not out_of_range_conditional_stocks:
             return
 
-        message = self._to_message(out_of_range_conditionalStocks)
+        message = Watcher._to_message(out_of_range_conditional_stocks)
         self.notifier.notify(self.watch_config_parser.smtp_setting, self.watch_config_parser.to_addrs, message)
 
-    def _is_out_of_price(self, condition_stock):
-        condition = condition_stock[0]
-        stock = condition_stock[1]
-        return not (condition.low_price < stock.current_price < condition.high_price)
-
-    def _to_message(self, out_of_range_conditionalStocks):
+    @staticmethod
+    def _to_message(out_of_range_conditional_stocks):
         message = []
-        for cs in out_of_range_conditionalStocks:
-            s = '{0} is [{1}], out of ({2}, {3})'.format(cs.number, cs.current_price, cs.low_price, cs.high_price)
+        for cs in out_of_range_conditional_stocks:
+            s = '{} is [{}], out of ({}, {})'.format(cs.number, cs.current_price, cs.low_price, cs.high_price)
             message.append(s)
         return '\n'.join(message)
 
@@ -59,5 +54,3 @@ class _ConditionalStock(object):
     @property
     def high_price(self):
         return self.condition.high_price
-
-
