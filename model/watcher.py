@@ -10,7 +10,7 @@ class Watcher(object):
             return
         watched_numbers = [c.number for c in watched_conditions]
 
-        stocks = self.price_querier.query(watched_numbers, self.watch_config_parser.timeout)
+        stocks = self.price_querier.query(watched_numbers, self.watch_config_parser.query_timeout)
         if not stocks:
             return
 
