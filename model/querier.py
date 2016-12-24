@@ -22,17 +22,17 @@ class PriceQuerier(object):
     def __init__(self, request):
         self.request = request
 
-    def query(self, stock_numbers):
+    def query(self, stock_numbers, timeout):
         url = self._compose_url(stock_numbers)
-        response = self.request.get(url)
+        response = self.request.get(url, timeout = timeout)
         if response.status_code != 200:
             return []
         return self._handle_response(response.json(), stock_numbers)
 
     @inlineCallbacks
-    def query_async(self, stock_numbers):
+    def query_async(self, stock_numbers, timeout):
         url = self._compose_url(stock_numbers)
-        r = yield self.request.get(url)
+        r = yield self.request.get(url, timeout = timeout)
         if r.code != 200:
             returnValue([])
         response = yield r.json()

@@ -10,13 +10,16 @@ class Watcher(object):
         if not watched_conditions:
             return
         watched_numbers = [c.number for c in watched_conditions]
-        stocks = self.price_querier.query(watched_numbers)
+
+        stocks = self.price_querier.query(watched_numbers, self.watch_config_parser.timeout)
         if not stocks:
             return
+
         conditionalStocks = [_ConditionalStock(ws[0], ws[1]) for ws in zip(watched_conditions, stocks)]
         out_of_range_conditionalStocks = [c for c in conditionalStocks if c.out_of_range()]
         if not out_of_range_conditionalStocks:
             return
+
         message = self._to_message(out_of_range_conditionalStocks)
         self.notifier.notify(self.watch_config_parser.smtp_setting, self.watch_config_parser.to_addrs, message)
 

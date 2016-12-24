@@ -71,8 +71,8 @@ class PriceQuerierTestCase(unittest.TestCase):
         FakeResponse.response = successful_response
 
         pq = PriceQuerier(requests)
-        stocks = pq.query(['1565.TWO', '2727.TW'])
-        requests.get.assert_called_with('https://query.yahooapis.com/v1/public/yql?q=select%20LastTradePriceOnly%20from%20yahoo.finance.quote%20where%20symbol%20in%20(%221565.TWO%22%2C%222727.TW%22)&format=json&env=store%3A//datatables.org/alltableswithkeys&callback=')
+        stocks = pq.query(['1565.TWO', '2727.TW'], 3)
+        requests.get.assert_called_with('https://query.yahooapis.com/v1/public/yql?q=select%20LastTradePriceOnly%20from%20yahoo.finance.quote%20where%20symbol%20in%20(%221565.TWO%22%2C%222727.TW%22)&format=json&env=store%3A//datatables.org/alltableswithkeys&callback=', timeout = 3)
         self.assertEqual(stocks, expected_stocks)
 
     def test_query_failed(self):
@@ -80,7 +80,7 @@ class PriceQuerierTestCase(unittest.TestCase):
         FakeResponse.response = successful_response
 
         pq = PriceQuerier(requests)
-        stocks = pq.query(['1565.TWO', '2727.TW'])
+        stocks = pq.query(['1565.TWO', '2727.TW'], 3)
         self.assertEqual(stocks, [])
 
     def test_query_async(self):
@@ -89,8 +89,8 @@ class PriceQuerierTestCase(unittest.TestCase):
         FakeResponse.response = successful_response
 
         pq = PriceQuerier(treq)
-        d = pq.query_async(['1565.TWO', '2727.TW'])
-        treq.get.assert_called_with('https://query.yahooapis.com/v1/public/yql?q=select%20LastTradePriceOnly%20from%20yahoo.finance.quote%20where%20symbol%20in%20(%221565.TWO%22%2C%222727.TW%22)&format=json&env=store%3A//datatables.org/alltableswithkeys&callback=')
+        d = pq.query_async(['1565.TWO', '2727.TW'], 3)
+        treq.get.assert_called_with('https://query.yahooapis.com/v1/public/yql?q=select%20LastTradePriceOnly%20from%20yahoo.finance.quote%20where%20symbol%20in%20(%221565.TWO%22%2C%222727.TW%22)&format=json&env=store%3A//datatables.org/alltableswithkeys&callback=', timeout = 3)
         self.assertEqual(d.result, expected_stocks)
 
     def test_query_async_failed(self):
@@ -98,14 +98,14 @@ class PriceQuerierTestCase(unittest.TestCase):
         FakeResponse.response = successful_response
 
         pq = PriceQuerier(treq)
-        d = pq.query_async(['1565.TWO', '2727.TW'])
+        d = pq.query_async(['1565.TWO', '2727.TW'], 3)
         self.assertEqual(len(d.result), 0)
 
         FakeResponse.status_code = 200
         FakeResponse.response = error_response
 
         pq = PriceQuerier(treq)
-        d = pq.query_async(['1565.TWO', '2727.TW'])
+        d = pq.query_async(['1565.TWO', '2727.TW'], 3)
         self.assertEqual(len(d.result), 0)
 
 
@@ -114,7 +114,7 @@ class PriceQuerierTestCase(unittest.TestCase):
 #         from twisted.internet import reactor
 #
 #         pq = PriceQuerier(treq)
-#         r = pq.query_async(['1565.TWO', '2727.TW'])
+#         r = pq.query_async(['1565.TWO', '2727.TW'], 3)
 #         reactor.callLater(2, reactor.stop)
 #         reactor.run()
 #         for s in r.result:
@@ -122,6 +122,6 @@ class PriceQuerierTestCase(unittest.TestCase):
 #
 #     def test_real_query(self):
 #         pq = PriceQuerier(requests)
-#         stocks = pq.query(['1565.TWO', '2727.TW'])
+#         stocks = pq.query(['1565.TWO', '2727.TW'], 3)
 #         for s in stocks:
 #             print s

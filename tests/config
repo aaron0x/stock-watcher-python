@@ -15,3 +15,6 @@ server=smtp.gmail.com:587
 user=aaron
 password=TWRocks
 subject=Stock Watcher
+
+[Query]
+timeout=3

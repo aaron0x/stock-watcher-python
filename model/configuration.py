@@ -22,6 +22,9 @@ class WatchConfigParser(object):
         self.smtp_setting = SMTPSetting(server, user, password, from_addr, subject)
         config_parser.remove_section('SMTP')
 
+        self.query_timeout = config_parser.getfloat('Query', 'timeout')
+        config_parser.remove_section('Query')
+
         sections = config_parser.sections()
         for s in sections:
             num = s

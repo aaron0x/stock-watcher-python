@@ -19,3 +19,4 @@ class WatchConfigParserTestCase(unittest.TestCase):
         self.assertEqual(wcp.watch_conditions, expected_wcs)
         self.assertEqual(wcp.to_addrs, expected_mails)
         self.assertEqual(wcp.smtp_setting, expected_smtp_setting)
+        self.assertEqual(wcp.query_timeout, 3)
