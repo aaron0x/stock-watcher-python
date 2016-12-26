@@ -1,3 +1,4 @@
+import codecs
 from ConfigParser import ConfigParser
 
 
@@ -11,35 +12,36 @@ class WatchConfigParser(object):
 
     def read(self, path):
         config_parser = ConfigParser()
-        config_parser.read(path)
+        with codecs.open(path, 'r', 'UTF-8') as file:
+            config_parser.readfp(file)
 
-        self.to_addrs = config_parser.get('Notification', 'address').split(',')
-        config_parser.remove_section('Notification')
+            self.to_addrs = config_parser.get('Notification', 'address').split(',')
+            config_parser.remove_section('Notification')
 
-        server = config_parser.get('SMTP', 'server')
-        user = config_parser.get('SMTP', 'user')
-        password = config_parser.get('SMTP', 'password')
-        from_addr = config_parser.get('SMTP', 'from')
-        subject = config_parser.get('SMTP', 'subject')
-        self.smtp_setting = SMTPSetting(server, user, password, from_addr, subject)
-        config_parser.remove_section('SMTP')
+            server = config_parser.get('SMTP', 'server')
+            user = config_parser.get('SMTP', 'user')
+            password = config_parser.get('SMTP', 'password')
+            from_addr = config_parser.get('SMTP', 'from')
+            subject = config_parser.get('SMTP', 'subject')
+            self.smtp_setting = SMTPSetting(server, user, password, from_addr, subject)
+            config_parser.remove_section('SMTP')
 
-        self.query_timeout = config_parser.getfloat('Query', 'timeout')
-        config_parser.remove_section('Query')
+            self.query_timeout = config_parser.getfloat('Query', 'timeout')
+            config_parser.remove_section('Query')
 
-        level = config_parser.get('Log', 'level')
-        path = config_parser.get('Log', 'path')
-        max_size = config_parser.getint('Log', 'max_size')
-        backup_num = config_parser.getint('Log', 'backup_num')
-        self.log_setting = LogSetting(level, path, max_size, backup_num)
-        config_parser.remove_section('Log')
+            level = config_parser.get('Log', 'level')
+            path = config_parser.get('Log', 'path')
+            max_size = config_parser.getint('Log', 'max_size')
+            backup_num = config_parser.getint('Log', 'backup_num')
+            self.log_setting = LogSetting(level, path, max_size, backup_num)
+            config_parser.remove_section('Log')
 
-        sections = config_parser.sections()
-        for s in sections:
-            num = s
-            low = config_parser.getfloat(s, 'low')
-            high = config_parser.getfloat(s, 'high')
-            self.watch_conditions.append(WatchCondition(num, low, high))
+            sections = config_parser.sections()
+            for s in sections:
+                num = s
+                low = config_parser.getfloat(s, 'low')
+                high = config_parser.getfloat(s, 'high')
+                self.watch_conditions.append(WatchCondition(num, low, high))
 
 
 class WatchCondition(object):
