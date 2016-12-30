@@ -23,4 +23,5 @@ class WatcherTestCase(unittest.TestCase):
         w = Watcher(watch_config_parser, price_querier, notifier)
         w.watch()
 
+        price_querier.query.assert_called_once_with(['1565.TWO', '2727.TW'],3)
         notifier.notify.assert_called_with(expected_smtp_setting ,expected_to_adds, expected_message)

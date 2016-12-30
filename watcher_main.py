@@ -29,7 +29,7 @@ def main():
     logger.info('Start!')
     try:
         price_querier = PriceQuerier(requests)
-        notifier = Notifier(smtplib.SMTP_SSL())
+        notifier = Notifier(smtplib.SMTP_SSL)
 
         w = Watcher(watch_config_parser, price_querier, notifier)
         w.watch()
