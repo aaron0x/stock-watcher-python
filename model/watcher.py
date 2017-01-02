@@ -1,3 +1,6 @@
+from model.querier import Stock
+
+
 class Watcher(object):
     def __init__(self, watch_config_parser, price_querier, notifier):
         self.watch_config_parser = watch_config_parser
@@ -31,21 +34,13 @@ class Watcher(object):
         return '\n'.join(message)
 
 
-class _ConditionalStock(object):
+class _ConditionalStock(Stock):
     def __init__(self, condition, stock):
+        super(_ConditionalStock, self).__init__(stock.number, stock.current_price)
         self.condition = condition
-        self.stock = stock
 
     def out_of_range(self):
         return not (self.low_price < self.current_price < self.high_price)
-
-    @property
-    def number(self):
-        return self.stock.number
-
-    @property
-    def current_price(self):
-        return self.stock.current_price
 
     @property
     def low_price(self):
