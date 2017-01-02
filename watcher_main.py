@@ -1,7 +1,5 @@
-import logging
 import sys
 import traceback
-from logging.handlers import RotatingFileHandler
 
 import requests
 import smtplib
@@ -10,6 +8,7 @@ from model.configuration import WatchConfigParser
 from model.querier import PriceQuerier
 from model.notification import Notifier
 from model.watcher import Watcher
+from model.logger import get_logger
 
 
 def main():
@@ -21,7 +20,7 @@ def main():
     try:
         watch_config_parser = WatchConfigParser()
         watch_config_parser.read(config_path)
-        logger = get_logger(watch_config_parser.log_setting)
+        logger = get_logger('Watcher', watch_config_parser.log_setting)
     except:
         sys.stderr.write(traceback.format_exc())
         return
@@ -37,16 +36,6 @@ def main():
         logger.error(traceback.format_exc())
     logger.info('End!')
 
-
-def get_logger(log_setting):
-    logger = logging.getLogger("Stock Watcher")
-    logger.setLevel(log_setting.level)
-    handler = RotatingFileHandler(log_setting.path, maxBytes=log_setting.max_size,
-                                  backupCount=log_setting.backup_num)
-    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s', "%Y-%m-%d %H:%M:%S")
-    handler.setFormatter(formatter)
-    logger.addHandler(handler)
-    return logger
 
 if __name__ == "__main__":
     main()
