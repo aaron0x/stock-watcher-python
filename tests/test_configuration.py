@@ -1,13 +1,36 @@
 import unittest
 
 from model.configuration import WatchCondition
+from model.configuration import WatchConditionParser
+from model.configuration import LogSettingParser
 from model.configuration import WatchConfigParser
 from model.configuration import SMTPSetting
 from model.configuration import LogSetting
 
 
+class WatchCoditionParserTestCase(unittest.TestCase):
+    def test_parse(self):
+        wc1 = WatchCondition('1565.TWO', 0.1, 123.4)
+        wc2 = WatchCondition('2727.TW', 10.0, 88.0)
+        expected_wcs = [wc1, wc2]
+
+        parser = WatchConditionParser()
+        parser.parse('./config')
+
+        self.assertEqual(parser.watch_conditions, expected_wcs)
+
+
+class LogSettingParserTestCase(unittest.TestCase):
+    def test_parse(self):
+        expected_log_setting = LogSetting('ERROR', '/home', 102400, 2)
+
+        parser = LogSettingParser()
+        parser.parse('./config')
+
+        self.assertEqual(parser.log_setting, expected_log_setting)
+
 class WatchConfigParserTestCase(unittest.TestCase):
-    def test_read(self):
+    def test_parse(self):
         wc1 = WatchCondition('1565.TWO', 0.1, 123.4)
         wc2 = WatchCondition('2727.TW', 10.0, 88.0)
         expected_wcs = [wc1, wc2]
@@ -16,7 +39,7 @@ class WatchConfigParserTestCase(unittest.TestCase):
         expected_log_setting = LogSetting('ERROR', '/home', 102400, 2)
 
         wcp = WatchConfigParser()
-        wcp.read("./config")
+        wcp.parse("./config")
 
         self.assertEqual(wcp.watch_conditions, expected_wcs)
         self.assertEqual(wcp.to_addrs, expected_mails)

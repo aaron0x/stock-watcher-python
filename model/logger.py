@@ -1,6 +1,7 @@
 import logging
 from logging.handlers import RotatingFileHandler
 
+
 def get_logger(name, log_setting):
     logger = logging.getLogger(name)
     logger.setLevel(log_setting.level)

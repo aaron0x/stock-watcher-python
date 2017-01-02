@@ -1,5 +1,41 @@
 import codecs
+import re
 from ConfigParser import ConfigParser
+
+
+class WatchConditionParser(object):
+    def __init__(self):
+        self.watch_conditions = []
+
+    def parse(self, path):
+        config_parser = ConfigParser()
+        with codecs.open(path, 'r', 'UTF-8') as f:
+            config_parser.readfp(f)
+            sections = config_parser.sections()
+            stock_pattern = re.compile('^[0-9]{4}.(TWO|TW)$')
+            for s in sections:
+                if not re.search(stock_pattern, s):
+                    continue
+                num = s
+                low = config_parser.getfloat(s, 'low')
+                high = config_parser.getfloat(s, 'high')
+                self.watch_conditions.append(WatchCondition(num, low, high))
+
+
+class LogSettingParser(object):
+    def __init__(self):
+        self.log_setting = None
+
+    def parse(self, path):
+        config_parser = ConfigParser()
+        with codecs.open(path, 'r', 'UTF-8') as f:
+            config_parser.readfp(f)
+
+            level = config_parser.get('Log', 'level')
+            log_path = config_parser.get('Log', 'path')
+            max_size = config_parser.getint('Log', 'max_size')
+            backup_num = config_parser.getint('Log', 'backup_num')
+            self.log_setting = LogSetting(level, log_path, max_size, backup_num)
 
 
 class WatchConfigParser(object):
@@ -10,13 +46,12 @@ class WatchConfigParser(object):
         self.query_timeout = 0
         self.log_setting = None
 
-    def read(self, path):
+    def parse(self, path):
         config_parser = ConfigParser()
-        with codecs.open(path, 'r', 'UTF-8') as file:
-            config_parser.readfp(file)
+        with codecs.open(path, 'r', 'UTF-8') as f:
+            config_parser.readfp(f)
 
             self.to_addrs = config_parser.get('Notification', 'address').split(',')
-            config_parser.remove_section('Notification')
 
             server = config_parser.get('SMTP', 'server')
             user = config_parser.get('SMTP', 'user')
@@ -24,24 +59,16 @@ class WatchConfigParser(object):
             from_addr = config_parser.get('SMTP', 'from')
             subject = config_parser.get('SMTP', 'subject')
             self.smtp_setting = SMTPSetting(server, user, password, from_addr, subject)
-            config_parser.remove_section('SMTP')
 
             self.query_timeout = config_parser.getfloat('Query', 'timeout')
-            config_parser.remove_section('Query')
 
-            level = config_parser.get('Log', 'level')
-            path = config_parser.get('Log', 'path')
-            max_size = config_parser.getint('Log', 'max_size')
-            backup_num = config_parser.getint('Log', 'backup_num')
-            self.log_setting = LogSetting(level, path, max_size, backup_num)
-            config_parser.remove_section('Log')
+            log_setting_parser = LogSettingParser()
+            log_setting_parser.parse(path)
+            self.log_setting = log_setting_parser.log_setting
 
-            sections = config_parser.sections()
-            for s in sections:
-                num = s
-                low = config_parser.getfloat(s, 'low')
-                high = config_parser.getfloat(s, 'high')
-                self.watch_conditions.append(WatchCondition(num, low, high))
+            watch_condition_parser = WatchConditionParser()
+            watch_condition_parser.parse(path)
+            self.watch_conditions = watch_condition_parser.watch_conditions
 
 
 class WatchCondition(object):

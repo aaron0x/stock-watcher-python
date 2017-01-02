@@ -19,7 +19,7 @@ def main():
 
     try:
         watch_config_parser = WatchConfigParser()
-        watch_config_parser.read(config_path)
+        watch_config_parser.parse(config_path)
         logger = get_logger('Watcher', watch_config_parser.log_setting)
     except:
         sys.stderr.write(traceback.format_exc())
