@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import unittest
 import treq
 import requests
@@ -6,6 +8,7 @@ from mock import MagicMock
 
 from model.querier import Stock
 from model.querier import PriceQuerier
+from model.querier import NameQuerier
 
 
 successful_response = '{ \
@@ -52,6 +55,9 @@ class FakeResponse(object):
 
     def json(self):
         return json.loads(FakeResponse.response)
+
+    def text(self):
+        return self.response
 
 
 class PriceQuerierTestCase(unittest.TestCase):
@@ -109,8 +115,8 @@ class PriceQuerierTestCase(unittest.TestCase):
         self.assertEqual(len(d.result), 0)
 
 
-# class PriceQuerierTestCase1(unittest.TestCase):
-#     def test_real_query_async(self):
+# class RealPriceQuerierTestCase(unittest.TestCase):
+#     def test_query_async(self):
 #         from twisted.internet import reactor
 #
 #         pq = PriceQuerier(treq)
@@ -120,8 +126,45 @@ class PriceQuerierTestCase(unittest.TestCase):
 #         for s in r.result:
 #             print s
 #
-#     def test_real_query(self):
+#     def test_query(self):
 #         pq = PriceQuerier(requests)
 #         stocks = pq.query(['1565.TWO', '2727.TW'], 3)
 #         for s in stocks:
 #             print s
+
+
+class NameQuerierTestCase(unittest.TestCase):
+    response = u'''<!doctype html>
+                <html lang="zh-TW">
+                <head>
+                    <meta charset="utf-8">
+                    <title>精華(1565)_即時行情_台股_WantGoo玩股網</title>
+                </head>
+                <body>
+                </body>
+                </html>'''
+    def setUp(self):
+        self.treq_get = treq.get
+        treq.get = MagicMock(return_value = FakeResponse())
+
+    def tearDown(self):
+        treq.get = self.treq_get
+
+    def test_query_async(self):
+        FakeResponse.status_code = 200
+        FakeResponse.response = NameQuerierTestCase.response
+
+        querier = NameQuerier(treq)
+        d = querier.query_async('1565.TWO')
+        self.assertEqual(d.result, u'精華')
+
+
+# class RealNameQuerierTestCase(unittest.TestCase):
+#     def test_query_async(self):
+#         from twisted.internet import reactor
+#
+#         pq = NameQuerier(treq)
+#         r = pq.query_async('1565.TWO')
+#         reactor.callLater(2, reactor.stop)
+#         reactor.run()
+#         print r.result

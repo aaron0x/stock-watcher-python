@@ -111,3 +111,14 @@ class LogSetting(object):
             return self.__dict__ == other.__dict__
         else:
             return False
+
+class DBConfigParser(object):
+    def __init__(self):
+        self.path = None
+
+    def parse(self, path):
+        config_parser = ConfigParser()
+        with codecs.open(path, 'r', 'UTF-8') as f:
+            config_parser.readfp(f)
+
+            self.path = config_parser.get('DB', 'path')

@@ -5,10 +5,11 @@ import HTML
 
 class List(object):
     @staticmethod
-    def format(content):
-        title = ['代號', '買入價', '賣出價']
+    def format(stocks):
+        # HTML.table doesn't support unicode, convert to utf-8 first.
+        title = [u'代號'.encode('utf-8'), u'名稱'.encode('utf-8'), u'買入價'.encode('utf-8'), u'賣出價'.encode('utf-8')]
         stock_rows = []
-        for c in content:
-            stock_rows.append([c.number, c.low_price, c.high_price])
+        for s in stocks:
+            stock_rows.append([s.number[:4].encode('utf-8'), s.name.encode('utf-8'), s.low_price, s.high_price])
 
-        return HTML.table([title] + stock_rows)
+        return '<meta charset="UTF-8">' + HTML.table([title] + stock_rows)

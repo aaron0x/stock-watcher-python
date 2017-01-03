@@ -6,6 +6,7 @@ from model.configuration import LogSettingParser
 from model.configuration import WatchConfigParser
 from model.configuration import SMTPSetting
 from model.configuration import LogSetting
+from model.configuration import DBConfigParser
 
 
 class WatchCoditionParserTestCase(unittest.TestCase):
@@ -46,3 +47,12 @@ class WatchConfigParserTestCase(unittest.TestCase):
         self.assertEqual(wcp.smtp_setting, expected_smtp_setting)
         self.assertEqual(wcp.query_timeout, 3)
         self.assertEqual(wcp.log_setting, expected_log_setting)
+
+class DBConfigParserTestCase(unittest.TestCase):
+    def test_parse(self):
+        expected_path = '/home'
+
+        parser = DBConfigParser()
+        parser.parse("./config")
+
+        self.assertEqual(parser.path, expected_path)

@@ -60,3 +60,23 @@ class PriceQuerier(object):
             price = float(q['LastTradePriceOnly'])
             stocks.append(Stock(number, price))
         return stocks
+
+
+class NameQuerier(object):
+    def __init__(self, request):
+        self.request = request
+
+    @inlineCallbacks
+    def query_async(self, number):
+        url = 'http://www.wantgoo.com/stock/' + number[:4] + '?searchType=stocks'
+        r = yield self.request.get(url)
+        if r.code != 200:
+            returnValue([])
+        response = yield r.text()
+        returnValue(self.parse_response_body(response))
+
+    @staticmethod
+    def parse_response_body(response):
+        name_start = response.find("<title>") + len("<title>")
+        name_end = response.find("(", name_start)
+        return response[name_start:name_end]
