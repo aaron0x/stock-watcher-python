@@ -17,7 +17,7 @@ class ListStockControllerTestCase(unittest.TestCase):
         raw2 = [u'2727', u'王品', u'10.0', u'88.0']
         expected_raws = [title, raw1, raw2]
 
-        page = ListPage(controller.list_async().result)
+        page = ListPage(controller.list_async(None).result)
         self.assertEqual(page.rows, expected_raws)
 
 
