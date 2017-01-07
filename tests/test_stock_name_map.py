@@ -15,7 +15,7 @@ class StockNameMapperTestCase(unittest.TestCase):
         name_querier = Mock()
 
         mapper = StockNameMapper(repository, name_querier)
-        result = mapper.map_async(stock_numbers)
+        result = mapper.map_async(stock_numbers, 3)
 
         name_querier.assert_not_called()
         repository.get_name.assert_called_once()
@@ -30,7 +30,7 @@ class StockNameMapperTestCase(unittest.TestCase):
         name_querier = Mock(**attrs2)
 
         mapper = StockNameMapper(repository, name_querier)
-        result = mapper.map_async(stock_numbers)
+        result = mapper.map_async(stock_numbers, 3)
 
         repository.get_name.assert_called_once()
         repository.save_name.assert_called_with(u'1565.TWO', u'精華')

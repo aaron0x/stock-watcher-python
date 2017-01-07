@@ -155,7 +155,7 @@ class NameQuerierTestCase(unittest.TestCase):
         FakeResponse.response = NameQuerierTestCase.response
 
         querier = NameQuerier(treq)
-        d = querier.query_async('1565.TWO')
+        d = querier.query_async('1565.TWO', 3)
         self.assertEqual(d.result, u'精華')
 
 

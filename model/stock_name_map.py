@@ -7,12 +7,12 @@ class StockNameMapper(object):
         self.name_querier = name_querier
 
     @inlineCallbacks
-    def map_async(self, stock_numbers):
+    def map_async(self, stock_numbers, timeout):
         names = []
         for s in stock_numbers:
             name = self.name_repository.get_name(s)
             if not name:
-                name = yield self.name_querier.query_async(s)
+                name = yield self.name_querier.query_async(s, timeout)
                 self.name_repository.save_name(s, name)
             names.append(name)
         returnValue(names)

@@ -18,7 +18,7 @@ class ListStockController(object):
     def list_async(self, _):
         conditions = self.config.watch_conditions
         stock_nums = [c.number for c in conditions]
-        stock_names = yield self.stock_name_mapper.map_async(stock_nums)
+        stock_names = yield self.stock_name_mapper.map_async(stock_nums, self.config.query_timeout)
         named_watch_conditions = [NamedWatchCondition(i[0], i[1]) for i in zip(stock_names, conditions)]
 
         returnValue(List.format(named_watch_conditions))

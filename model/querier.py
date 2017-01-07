@@ -68,9 +68,9 @@ class NameQuerier(object):
 
     @retry(stop_max_attempt_number=3, wait_fixed=3000)
     @inlineCallbacks
-    def query_async(self, number):
+    def query_async(self, number, timeout):
         url = 'http://www.wantgoo.com/stock/' + number[:4] + '?searchType=stocks'
-        r = yield self.request.get(url)
+        r = yield self.request.get(url, timeout=timeout)
         if r.code != 200:
             returnValue([])
         response = yield r.text()
