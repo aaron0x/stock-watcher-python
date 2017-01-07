@@ -25,5 +25,5 @@ path=/home
 max_size=102400
 backup_num=2
 
-[DB]
+[Repository]
 path=/home

@@ -8,7 +8,7 @@ from model.configuration import LogConfigParser
 from model.configuration import WatchConfigParser
 from model.configuration import SMTPConfig
 from model.configuration import LogConfig
-from model.configuration import DBConfigParser
+from model.configuration import RepositoryConfigParser
 from model.configuration import WebConfigParser
 
 
@@ -81,14 +81,14 @@ class WebConfigParserTestCase(unittest.TestCase):
         self.assertEqual(config.db_path, '/home')
 
 
-class DBConfigParserTestCase(unittest.TestCase):
+class RepositoryConfigParserTestCase(unittest.TestCase):
     def test_parse(self):
         expected_path = '/home'
 
         with codecs.open('./config', 'r', 'utf-8') as f:
             c = ConfigParser()
             c.readfp(f)
-            parser = DBConfigParser()
+            parser = RepositoryConfigParser()
             parser.parse(c)
 
         self.assertEqual(parser.path, expected_path)

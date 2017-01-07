@@ -77,7 +77,7 @@ class WebConfigParser(object):
         watch_condition_parser.parse(config_obj)
         self.watch_conditions = watch_condition_parser.watch_conditions
 
-        db_config_parser = DBConfigParser()
+        db_config_parser = RepositoryConfigParser()
         db_config_parser.parse(config_obj)
         self.db_path = db_config_parser.path
 
@@ -124,9 +124,9 @@ class LogConfig(object):
             return False
 
 
-class DBConfigParser(object):
+class RepositoryConfigParser(object):
     def __init__(self):
         self.path = None
 
     def parse(self, config_obj):
-        self.path = config_obj.get('DB', 'path')
+        self.path = config_obj.get('Repository', 'path')
