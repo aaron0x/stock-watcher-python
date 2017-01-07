@@ -66,6 +66,7 @@ class NameQuerier(object):
     def __init__(self, request):
         self.request = request
 
+    @retry(stop_max_attempt_number=3, wait_fixed=3000)
     @inlineCallbacks
     def query_async(self, number):
         url = 'http://www.wantgoo.com/stock/' + number[:4] + '?searchType=stocks'
