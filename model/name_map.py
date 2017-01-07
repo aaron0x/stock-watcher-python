@@ -1,15 +1,15 @@
 from twisted.internet.defer import inlineCallbacks
 from twisted.internet.defer import returnValue
 
-class StockNameMapper(object):
+class NameMapper(object):
     def __init__(self, name_repository, name_querier):
         self.name_repository = name_repository
         self.name_querier = name_querier
 
     @inlineCallbacks
-    def map_async(self, stock_numbers, timeout):
+    def map_async(self, numbers, timeout):
         names = []
-        for s in stock_numbers:
+        for s in numbers:
             name = self.name_repository.get_name(s)
             if not name:
                 name = yield self.name_querier.query_async(s, timeout)

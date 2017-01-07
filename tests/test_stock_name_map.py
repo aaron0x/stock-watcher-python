@@ -3,7 +3,7 @@
 import unittest
 from mock import Mock
 
-from model.stock_name_map import StockNameMapper
+from model.name_map import NameMapper
 
 
 class StockNameMapperTestCase(unittest.TestCase):
@@ -14,7 +14,7 @@ class StockNameMapperTestCase(unittest.TestCase):
         repository = Mock(**attrs)
         name_querier = Mock()
 
-        mapper = StockNameMapper(repository, name_querier)
+        mapper = NameMapper(repository, name_querier)
         result = mapper.map_async(stock_numbers, 3)
 
         name_querier.assert_not_called()
@@ -29,7 +29,7 @@ class StockNameMapperTestCase(unittest.TestCase):
         attrs2 = {'query_async.return_value': u'精華'}
         name_querier = Mock(**attrs2)
 
-        mapper = StockNameMapper(repository, name_querier)
+        mapper = NameMapper(repository, name_querier)
         result = mapper.map_async(stock_numbers, 3)
 
         repository.get_name.assert_called_once()
