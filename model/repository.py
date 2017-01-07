@@ -11,9 +11,11 @@ class StockNameRepository(object):
         self.engine = create_engine("sqlite:///" + path)
 
         metadata = MetaData()
-        self.stocks = Table('stock', metadata,
-                       Column('number', String(), primary_key=True),
-                       Column('name', String(), nullable=False))
+        self.stocks = Table(
+                'stock', metadata,
+                Column('number', String(), primary_key=True),
+                Column('name', String(), nullable=False)
+        )
         metadata.create_all(self.engine)
 
     def get_name(self, number):

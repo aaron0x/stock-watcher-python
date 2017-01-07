@@ -71,6 +71,34 @@ class WatchConfigParser(object):
             self.watch_conditions = watch_condition_parser.watch_conditions
 
 
+class WebConfig(object):
+    def __init__(self):
+        self.watch_conditions = []
+        self.smtp_setting = None
+        self.query_timeout = 0
+        self.log_setting = None
+        self.db_path = None
+
+    def read(self, path):
+        config_parser = ConfigParser()
+        with codecs.open(path, 'r', 'UTF-8') as f:
+            config_parser.readfp(f)
+
+            self.query_timeout = config_parser.getfloat('Query', 'timeout')
+
+            log_setting_parser = LogSettingParser()
+            log_setting_parser.parse(path)
+            self.log_setting = log_setting_parser.log_setting
+
+            watch_condition_parser = WatchConditionParser()
+            watch_condition_parser.parse(path)
+            self.watch_conditions = watch_condition_parser.watch_conditions
+
+            db_config_parser = DBConfigParser()
+            db_config_parser.parse(path)
+            self.db_path = db_config_parser.path
+
+
 class WatchCondition(object):
     def __init__(self, number, low_price, high_price):
         self.number = number
@@ -111,6 +139,7 @@ class LogSetting(object):
             return self.__dict__ == other.__dict__
         else:
             return False
+
 
 class DBConfigParser(object):
     def __init__(self):
