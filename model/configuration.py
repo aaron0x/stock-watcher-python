@@ -40,12 +40,9 @@ class WatchConfigParser(object):
     def parse(self, config_obj):
         self.to_addrs = config_obj.get('Notification', 'address').split(',')
 
-        server = config_obj.get('SMTP', 'server')
-        user = config_obj.get('SMTP', 'user')
-        password = config_obj.get('SMTP', 'password')
-        from_addr = config_obj.get('SMTP', 'from')
-        subject = config_obj.get('SMTP', 'subject')
-        self.smtp_config = SMTPConfig(server, user, password, from_addr, subject)
+        smtp_config_parser = SMTPConfigParser()
+        smtp_config_parser.parse(config_obj)
+        self.smtp_config = smtp_config_parser.smtp_config
 
         self.query_timeout = config_obj.getfloat('Query', 'timeout')
 
@@ -108,6 +105,19 @@ class SMTPConfig(object):
             return self.__dict__ == other.__dict__
         else:
             return False
+
+
+class SMTPConfigParser(object):
+    def __init__(self):
+        self.smtp_config = None
+
+    def parse(self, config_obj):
+        server = config_obj.get('SMTP', 'server')
+        user = config_obj.get('SMTP', 'user')
+        password = config_obj.get('SMTP', 'password')
+        from_addr = config_obj.get('SMTP', 'from')
+        subject = config_obj.get('SMTP', 'subject')
+        self.smtp_config = SMTPConfig(server, user, password, from_addr, subject)
 
 
 class LogConfig(object):

@@ -10,6 +10,7 @@ from model.configuration import SMTPConfig
 from model.configuration import LogConfig
 from model.configuration import RepositoryConfigParser
 from model.configuration import WebConfigParser
+from model.configuration import SMTPConfigParser
 
 
 class WatchCoditionParserTestCase(unittest.TestCase):
@@ -92,3 +93,23 @@ class RepositoryConfigParserTestCase(unittest.TestCase):
             parser.parse(c)
 
         self.assertEqual(parser.path, expected_path)
+
+
+class SMTPConfigParserTestCase(unittest.TestCase):
+    def test_parse(self):
+
+        expected_smtp_config = SMTPConfig(
+                'smtp.gmail.com:587',
+                'aaron',
+                'TWRocks',
+                'aaron@gmail.com',
+                'Stock Watcher'
+        )
+
+        with codecs.open('./config', 'r', 'utf-8') as f:
+            c = ConfigParser()
+            c.readfp(f)
+            parser = SMTPConfigParser()
+            parser.parse(c)
+
+        self.assertEqual(parser.smtp_config, expected_smtp_config)
