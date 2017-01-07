@@ -34,7 +34,7 @@ def main():
         querier = NameQuerier(treq)
         stock_name_mapper = NameMapper(repository, querier)
         controller = ListStockController(parser, stock_name_mapper)
-        controller.app.run('0.0.0.0', 8080)
+        controller.app.run('0.0.0.0', parser.port)
     except:
         logger.error(traceback.format_exc())
 

@@ -80,6 +80,7 @@ class WebConfigParserTestCase(unittest.TestCase):
         self.assertEqual(config.query_timeout, 3)
         self.assertEqual(config.log_config, expected_log_config)
         self.assertEqual(config.db_path, '/home')
+        self.assertEqual(config.port, '8080')
 
 
 class RepositoryConfigParserTestCase(unittest.TestCase):

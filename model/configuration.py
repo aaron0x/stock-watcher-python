@@ -62,6 +62,7 @@ class WebConfigParser(object):
         self.query_timeout = 0
         self.log_config = None
         self.db_path = None
+        self.port = None
 
     def parse(self, config_obj):
         self.query_timeout = config_obj.getfloat('Query', 'timeout')
@@ -77,6 +78,8 @@ class WebConfigParser(object):
         db_config_parser = RepositoryConfigParser()
         db_config_parser.parse(config_obj)
         self.db_path = db_config_parser.path
+
+        self.port = config_obj.get('Web', 'port')
 
 
 class WatchCondition(object):

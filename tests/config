@@ -27,3 +27,6 @@ backup_num=2
 
 [Repository]
 path=/home
+
+[Web]
+port=8080
