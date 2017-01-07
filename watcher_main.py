@@ -1,5 +1,7 @@
 import sys
 import traceback
+import codecs
+from ConfigParser import ConfigParser
 
 import requests
 import smtplib
@@ -19,8 +21,11 @@ def main():
 
     try:
         watch_config_parser = WatchConfigParser()
-        watch_config_parser.parse(config_path)
-        logger = get_logger('Watcher', watch_config_parser.log_setting)
+        with codecs.open(config_path, 'r', 'utf-8') as f:
+            config = ConfigParser()
+            config.readfp(f)
+            watch_config_parser.parse(config)
+            logger = get_logger('Watcher', watch_config_parser.log_config)
     except:
         sys.stderr.write(traceback.format_exc())
         return

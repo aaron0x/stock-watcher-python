@@ -1,8 +1,10 @@
 import sys
+import codecs
+from ConfigParser import ConfigParser
 
 import treq
 
-from model.configuration import WebConfig
+from model.configuration import WebConfigParser
 from model.repository import StockNameRepository
 from model.stock_name_map import StockNameMapper
 from model.querier import NameQuerier
@@ -14,12 +16,15 @@ def main():
         return
 
     config_path = sys.argv[1]
-    config = WebConfig()
-    config.read(config_path)
-    repository = StockNameRepository(config.db_path)
+    with codecs.open(config_path, 'r', 'utf-8') as f:
+        config = ConfigParser()
+        config.readfp(f)
+        parser = WebConfigParser()
+        parser.parse(config)
+    repository = StockNameRepository(parser.db_path)
     querier = NameQuerier(treq)
     stock_name_mapper = StockNameMapper(repository, querier)
-    controller = ListStockController(config, stock_name_mapper)
+    controller = ListStockController(parser, stock_name_mapper)
     controller.app.run('0.0.0.0', 8080)
 
 if __name__ == '__main__':

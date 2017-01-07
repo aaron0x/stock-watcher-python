@@ -2,11 +2,11 @@ import logging
 from logging.handlers import RotatingFileHandler
 
 
-def get_logger(name, log_setting):
+def get_logger(name, log_config):
     logger = logging.getLogger(name)
-    logger.setLevel(log_setting.level)
-    handler = RotatingFileHandler(log_setting.path, maxBytes=log_setting.max_size,
-                                  backupCount=log_setting.backup_num)
+    logger.setLevel(log_config.level)
+    handler = RotatingFileHandler(log_config.path, maxBytes=log_config.max_size,
+                                  backupCount=log_config.backup_num)
     formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s', "%Y-%m-%d %H:%M:%S")
     handler.setFormatter(formatter)
     logger.addHandler(handler)

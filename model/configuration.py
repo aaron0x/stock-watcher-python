@@ -1,102 +1,85 @@
-import codecs
 import re
-from ConfigParser import ConfigParser
 
 
 class WatchConditionParser(object):
     def __init__(self):
         self.watch_conditions = []
 
-    def parse(self, path):
-        config_parser = ConfigParser()
-        with codecs.open(path, 'r', 'UTF-8') as f:
-            config_parser.readfp(f)
-            sections = config_parser.sections()
-            stock_pattern = re.compile('^[0-9]{4}.(TWO|TW)$')
-            for s in sections:
-                if not re.search(stock_pattern, s):
-                    continue
-                num = s
-                low = config_parser.getfloat(s, 'low')
-                high = config_parser.getfloat(s, 'high')
-                self.watch_conditions.append(WatchCondition(num, low, high))
+    def parse(self, config_obj):
+        sections = config_obj.sections()
+        stock_pattern = re.compile('^[0-9]{4}.(TWO|TW)$')
+        for s in sections:
+            if not re.search(stock_pattern, s):
+                continue
+            num = s
+            low = config_obj.getfloat(s, 'low')
+            high = config_obj.getfloat(s, 'high')
+            self.watch_conditions.append(WatchCondition(num, low, high))
 
 
-class LogSettingParser(object):
+class LogConfigParser(object):
     def __init__(self):
-        self.log_setting = None
+        self.log_config = None
 
-    def parse(self, path):
-        config_parser = ConfigParser()
-        with codecs.open(path, 'r', 'UTF-8') as f:
-            config_parser.readfp(f)
-
-            level = config_parser.get('Log', 'level')
-            log_path = config_parser.get('Log', 'path')
-            max_size = config_parser.getint('Log', 'max_size')
-            backup_num = config_parser.getint('Log', 'backup_num')
-            self.log_setting = LogSetting(level, log_path, max_size, backup_num)
+    def parse(self, config_obj):
+        level = config_obj.get('Log', 'level')
+        log_path = config_obj.get('Log', 'path')
+        max_size = config_obj.getint('Log', 'max_size')
+        backup_num = config_obj.getint('Log', 'backup_num')
+        self.log_config = LogConfig(level, log_path, max_size, backup_num)
 
 
 class WatchConfigParser(object):
     def __init__(self):
         self.to_addrs = []
         self.watch_conditions = []
-        self.smtp_setting = None
+        self.smtp_config = None
         self.query_timeout = 0
-        self.log_setting = None
+        self.log_config = None
 
-    def parse(self, path):
-        config_parser = ConfigParser()
-        with codecs.open(path, 'r', 'UTF-8') as f:
-            config_parser.readfp(f)
+    def parse(self, config_obj):
+        self.to_addrs = config_obj.get('Notification', 'address').split(',')
 
-            self.to_addrs = config_parser.get('Notification', 'address').split(',')
+        server = config_obj.get('SMTP', 'server')
+        user = config_obj.get('SMTP', 'user')
+        password = config_obj.get('SMTP', 'password')
+        from_addr = config_obj.get('SMTP', 'from')
+        subject = config_obj.get('SMTP', 'subject')
+        self.smtp_config = SMTPConfig(server, user, password, from_addr, subject)
 
-            server = config_parser.get('SMTP', 'server')
-            user = config_parser.get('SMTP', 'user')
-            password = config_parser.get('SMTP', 'password')
-            from_addr = config_parser.get('SMTP', 'from')
-            subject = config_parser.get('SMTP', 'subject')
-            self.smtp_setting = SMTPSetting(server, user, password, from_addr, subject)
+        self.query_timeout = config_obj.getfloat('Query', 'timeout')
 
-            self.query_timeout = config_parser.getfloat('Query', 'timeout')
+        log_config_parser = LogConfigParser()
+        log_config_parser.parse(config_obj)
+        self.log_config = log_config_parser.log_config
 
-            log_setting_parser = LogSettingParser()
-            log_setting_parser.parse(path)
-            self.log_setting = log_setting_parser.log_setting
-
-            watch_condition_parser = WatchConditionParser()
-            watch_condition_parser.parse(path)
-            self.watch_conditions = watch_condition_parser.watch_conditions
+        watch_condition_parser = WatchConditionParser()
+        watch_condition_parser.parse(config_obj)
+        self.watch_conditions = watch_condition_parser.watch_conditions
 
 
-class WebConfig(object):
+class WebConfigParser(object):
     def __init__(self):
         self.watch_conditions = []
-        self.smtp_setting = None
+        self.smtp_config = None
         self.query_timeout = 0
-        self.log_setting = None
+        self.log_config = None
         self.db_path = None
 
-    def read(self, path):
-        config_parser = ConfigParser()
-        with codecs.open(path, 'r', 'UTF-8') as f:
-            config_parser.readfp(f)
+    def parse(self, config_obj):
+        self.query_timeout = config_obj.getfloat('Query', 'timeout')
 
-            self.query_timeout = config_parser.getfloat('Query', 'timeout')
+        log_config_parser = LogConfigParser()
+        log_config_parser.parse(config_obj)
+        self.log_config = log_config_parser.log_config
 
-            log_setting_parser = LogSettingParser()
-            log_setting_parser.parse(path)
-            self.log_setting = log_setting_parser.log_setting
+        watch_condition_parser = WatchConditionParser()
+        watch_condition_parser.parse(config_obj)
+        self.watch_conditions = watch_condition_parser.watch_conditions
 
-            watch_condition_parser = WatchConditionParser()
-            watch_condition_parser.parse(path)
-            self.watch_conditions = watch_condition_parser.watch_conditions
-
-            db_config_parser = DBConfigParser()
-            db_config_parser.parse(path)
-            self.db_path = db_config_parser.path
+        db_config_parser = DBConfigParser()
+        db_config_parser.parse(config_obj)
+        self.db_path = db_config_parser.path
 
 
 class WatchCondition(object):
@@ -112,7 +95,7 @@ class WatchCondition(object):
             return False
 
 
-class SMTPSetting(object):
+class SMTPConfig(object):
     def __init__(self, server, user, password, from_addr, subject):
         self.server = server
         self.user = user
@@ -127,7 +110,7 @@ class SMTPSetting(object):
             return False
 
 
-class LogSetting(object):
+class LogConfig(object):
     def __init__(self, level, path, max_size, backup_num):
         self.level = level
         self.path = path
@@ -145,9 +128,5 @@ class DBConfigParser(object):
     def __init__(self):
         self.path = None
 
-    def parse(self, path):
-        config_parser = ConfigParser()
-        with codecs.open(path, 'r', 'UTF-8') as f:
-            config_parser.readfp(f)
-
-            self.path = config_parser.get('DB', 'path')
+    def parse(self, config_obj):
+        self.path = config_obj.get('DB', 'path')

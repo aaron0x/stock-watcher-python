@@ -23,7 +23,7 @@ class Watcher(object):
             return
 
         message = Watcher._to_message(out_of_range_conditional_stocks)
-        self.notifier.notify(self.watch_config_parser.smtp_setting, self.watch_config_parser.to_addrs, message)
+        self.notifier.notify(self.watch_config_parser.smtp_config, self.watch_config_parser.to_addrs, message)
 
     @staticmethod
     def _to_message(out_of_range_conditional_stocks):

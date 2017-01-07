@@ -2,7 +2,7 @@ import unittest
 from mock import Mock
 
 from model.notification import Notifier
-from model.configuration import SMTPSetting
+from model.configuration import SMTPConfig
 
 from email.mime.text import MIMEText
 
@@ -11,7 +11,7 @@ class NotifierTestCase(unittest.TestCase):
     def test_notify(self):
         expected_to_adds = ['aaron1126@gmail.com', 'silver@yahoo.com']
         message = 'goodday'
-        expected_smtp_setting = SMTPSetting('smtp.gmail.com:587', 'aaron', 'haveaniceday', 'aaron@gmail.com', 'subject')
+        expected_smtp_setting = SMTPConfig('smtp.gmail.com:587', 'aaron', 'haveaniceday', 'aaron@gmail.com', 'subject')
         expected_message = MIMEText(message)
         expected_message['From'] = expected_smtp_setting.from_addr
         expected_message['To'] = ','.join(expected_to_adds)
