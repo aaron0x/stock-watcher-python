@@ -12,16 +12,18 @@ class ListStockController(object):
     def __init__(self, config, stock_name_mapper):
         self.config = config
         self.stock_name_mapper = stock_name_mapper
+        self.named_watch_conditions = None
 
     @app.route('/stocks')
     @inlineCallbacks
     def list_async(self, _):
-        conditions = self.config.watch_conditions
-        stock_nums = [c.number for c in conditions]
-        stock_names = yield self.stock_name_mapper.map_async(stock_nums, self.config.query_timeout)
-        named_watch_conditions = [NamedWatchCondition(i[0], i[1]) for i in zip(stock_names, conditions)]
+        if self.named_watch_conditions is None:
+            conditions = self.config.watch_conditions
+            stock_nums = [c.number for c in conditions]
+            stock_names = yield self.stock_name_mapper.map_async(stock_nums, self.config.query_timeout)
+            self.named_watch_conditions = [NamedWatchCondition(i[0], i[1]) for i in zip(stock_names, conditions)]
 
-        returnValue(List.format(named_watch_conditions))
+        returnValue(List.format(self.named_watch_conditions))
 
 
 class NamedWatchCondition(WatchCondition):
