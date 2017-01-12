@@ -158,6 +158,14 @@ class NameQuerierTestCase(unittest.TestCase):
         d = querier.query_async('1565.TWO', 3)
         self.assertEqual(d.result, u'精華')
 
+    def test_query_async_failed(self):
+        FakeResponse.status_code = 500
+        FakeResponse.response = NameQuerierTestCase.response
+
+        querier = NameQuerier(treq)
+        d = querier.query_async('1565.TWO', 3)
+        self.assertEqual(d.result, '')
+
 
 # class RealNameQuerierTestCase(unittest.TestCase):
 #     def test_query_async(self):

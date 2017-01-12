@@ -72,7 +72,7 @@ class NameQuerier(object):
         url = 'http://www.wantgoo.com/stock/' + number[:4] + '?searchType=stocks'
         r = yield self.request.get(url, timeout=timeout)
         if r.code != 200:
-            returnValue([])
+            returnValue('')
         response = yield r.text()
         returnValue(self.parse_response_body(response))
 
