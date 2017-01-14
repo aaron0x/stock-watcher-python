@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 
-import unittest
 import treq
 import requests
 import json
-from mock import MagicMock
+from mock import MagicMock, Mock, call
 
-from model.querier import Stock
-from model.querier import PriceQuerier
-from model.querier import NameQuerier
+from twisted.trial import unittest
+from twisted.internet.defer import succeed, fail
+
+from model.querier import Stock, NameQuerier, PriceQuerier, NameQueryRetry, NameQueryException
 
 
 successful_response = '{ \
@@ -164,7 +164,35 @@ class NameQuerierTestCase(unittest.TestCase):
 
         querier = NameQuerier(treq)
         d = querier.query_async('1565.TWO', 3)
-        self.assertEqual(d.result, '')
+        self.assertEqual(d.result.value.code, 500)
+        d.addErrback(lambda _: None)
+
+
+class NameQueryRetryTestCase(unittest.TestCase):
+    def test_async_query_retry_no_retry(self):
+        d = succeed(u'精華')
+        attrs = {'query_async.return_value': d}
+        querier = Mock(**attrs)
+        retry = NameQueryRetry(querier)
+        result = retry.query_async(u'1565.TWO', 3, 1, 10)
+
+        self.assertEqual(result.result, u'精華')
+
+    def test_async_query_retry_once(self):
+        d1, d2 = fail(NameQueryException(500, 'some error')), succeed(u'精華')
+        m1 = MagicMock(side_effect=[d1, d2])
+        attrs = {'query_async': m1}
+        querier = Mock(**attrs)
+        retry = NameQueryRetry(querier)
+        result = retry.query_async(u'1565.TWO', 3, 1, 10)
+
+        def asserts(r):
+            self.assertEqual(r, u'精華')
+            self.assertEqual(querier.mock_calls, [call.query_async(u'1565.TWO', 3), call.query_async(u'1565.TWO', 3)])
+        result.addCallback(asserts)
+
+        return result
+
 
 
 # class RealNameQuerierTestCase(unittest.TestCase):

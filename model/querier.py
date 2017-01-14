@@ -1,7 +1,7 @@
 import urllib
 
 from retrying import retry
-from twisted.internet.defer import inlineCallbacks, returnValue
+from twisted.internet.defer import inlineCallbacks, returnValue, Deferred
 
 
 class Stock(object):
@@ -70,9 +70,9 @@ class NameQuerier(object):
     def query_async(self, number, timeout):
         url = 'http://www.wantgoo.com/stock/' + number[:4] + '?searchType=stocks'
         r = yield self.request.get(url, timeout=timeout)
-        if r.code != 200:
-            returnValue('')
         response = yield r.text()
+        if r.code != 200:
+            raise NameQueryException(r.code, response)
         returnValue(self.parse_response_body(response))
 
     @staticmethod
@@ -80,3 +80,33 @@ class NameQuerier(object):
         name_start = response.find("<title>") + len("<title>")
         name_end = response.find("(", name_start)
         return response[name_start:name_end]
+
+
+class NameQueryRetry(object):
+    def __init__(self, querier):
+        self.querier = querier
+
+    @inlineCallbacks
+    def query_async(self, number, timeout, retry_num=2, retry_interval_ms=1000):
+        while True:
+            try:
+                d = yield self.querier.query_async(number, timeout)
+                returnValue(d)
+            except NameQueryException:
+                from twisted.internet import reactor
+
+                if retry_num > 0:
+                    def f():
+                        d.callback(None)
+                    retry_num -= 1
+                    dc = reactor.callLater(retry_interval_ms / 1000, f)
+                    d = Deferred(dc.cancel)
+                    yield d
+                else:
+                    raise
+
+
+class NameQueryException(Exception):
+    def __init__(self, code, msg):
+        super(NameQueryException, self).__init__(msg)
+        self.code = code
