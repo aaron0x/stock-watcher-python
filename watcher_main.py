@@ -10,7 +10,7 @@ from model.configuration import WatchConfigParser
 from model.querier import PriceQuerier
 from model.notification import Notifier
 from model.watcher import Watcher
-from model.logger import get_logger
+from model.logger import init_logger, get_logger
 
 
 def main():
@@ -25,7 +25,8 @@ def main():
             config = ConfigParser()
             config.readfp(f)
             watch_config_parser.parse(config)
-            logger = get_logger('Watcher', watch_config_parser.log_config)
+            init_logger('Watcher', watch_config_parser.log_config)
+            logger = get_logger()
     except:
         sys.stderr.write(traceback.format_exc())
         return

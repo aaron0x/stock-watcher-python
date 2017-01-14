@@ -4,10 +4,9 @@ from logging.handlers import RotatingFileHandler
 
 logger = None
 
-def get_logger(name, log_config):
+
+def init_logger(name, log_config):
     global logger
-    if logger:
-        return logger
 
     logger = logging.getLogger(name)
     logger.setLevel(log_config.level)
@@ -16,4 +15,8 @@ def get_logger(name, log_config):
     formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s', "%Y-%m-%d %H:%M:%S")
     handler.setFormatter(formatter)
     logger.addHandler(handler)
+
+
+def get_logger():
+    global logger
     return logger

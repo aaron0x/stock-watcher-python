@@ -1,6 +1,10 @@
+import traceback
+
 from twisted.internet.defer import inlineCallbacks
 from twisted.internet.defer import returnValue
 from twisted.internet.defer import DeferredList
+
+from logger import get_logger
 
 
 class NameMapper(object):
@@ -14,16 +18,19 @@ class NameMapper(object):
             names[index] = result
             self.name_repository.save_name(num, result)
 
-        names = [None] * len(numbers)
+        names = [''] * len(numbers)
         deferreds = []
         for i, s in enumerate(numbers):
             name = self.name_repository.get_name(s)
             if name:
                 names[i] = name
             else:
-                d = self.name_querier.query_async(s, timeout)
-                d.addCallback(fill_name, i, s)
-                deferreds.append(d)
+                try:
+                    d = self.name_querier.query_async(s, timeout)
+                    d.addCallback(fill_name, i, s)
+                    deferreds.append(d)
+                except:
+                    get_logger().error(traceback.format_exc())
         if deferreds:
             yield DeferredList(deferreds)
         returnValue(names)

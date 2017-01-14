@@ -5,7 +5,7 @@ from ConfigParser import ConfigParser
 
 import treq
 
-from model.logger import get_logger
+from model.logger import init_logger
 from model.configuration import WebConfigParser
 from model.repository import StockNameRepository
 from model.name_map import NameMapper
@@ -25,7 +25,7 @@ def main():
             config.readfp(f)
             parser = WebConfigParser()
             parser.parse(config)
-        logger = get_logger('web', parser.log_config)
+        logger = init_logger('web', parser.log_config)
     except:
         sys.stderr.write('parse config error:' + traceback.format_exc())
         return
