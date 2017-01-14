@@ -69,11 +69,11 @@ class NameQuerier(object):
     @inlineCallbacks
     def query_async(self, number, timeout):
         url = 'http://www.wantgoo.com/stock/' + number[:4] + '?searchType=stocks'
-        r = yield self.request.get(url, timeout=timeout)
-        response = yield r.text()
-        if r.code != 200:
-            raise NameQueryException(r.code, response)
-        returnValue(self.parse_response_body(response))
+        response = yield self.request.get(url, timeout=timeout)
+        content = yield response.text()
+        if response.code != 200:
+            raise NameQueryException(response.code, content)
+        returnValue(self.parse_response_body(content))
 
     @staticmethod
     def parse_response_body(response):
