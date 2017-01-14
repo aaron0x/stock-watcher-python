@@ -12,6 +12,7 @@ from model.name_map import NameMapper
 from model.querier import NameQuerier
 from controller.list import ListStockController
 
+
 def main():
     if len(sys.argv) != 2:
         sys.stderr.write('useage: program <config_path>\n')
@@ -26,7 +27,7 @@ def main():
             parser.parse(config)
         logger = get_logger('web', parser.log_config)
     except:
-        sys.stderr.write('parse config error:' +  traceback.format_exc())
+        sys.stderr.write('parse config error:' + traceback.format_exc())
         return
 
     try:
