@@ -9,7 +9,7 @@ from model.logger import get_logger
 from model.configuration import WebConfigParser
 from model.repository import StockNameRepository
 from model.name_map import NameMapper
-from model.querier import NameQuerier
+from model.querier import NameQuerier, RetriedNameQuerier
 from controller.list import ListStockController
 
 
@@ -32,7 +32,7 @@ def main():
 
     try:
         repository = StockNameRepository(parser.db_path)
-        querier = NameQuerier(treq)
+        querier = RetriedNameQuerier(NameQuerier(treq))
         stock_name_mapper = NameMapper(repository, querier)
         controller = ListStockController(parser, stock_name_mapper)
         controller.app.run('0.0.0.0', parser.port)
