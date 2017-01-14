@@ -8,7 +8,7 @@ from mock import MagicMock, Mock, call
 from twisted.trial import unittest
 from twisted.internet.defer import succeed, fail
 
-from model.querier import Stock, NameQuerier, PriceQuerier, NameQueryRetry, NameQueryException
+from model.querier import Stock, NameQuerier, PriceQuerier, RetriedNameQuerier, NameQueryException
 
 
 successful_response = '{ \
@@ -168,12 +168,12 @@ class NameQuerierTestCase(unittest.TestCase):
         d.addErrback(lambda _: None)
 
 
-class NameQueryRetryTestCase(unittest.TestCase):
+class RetriedNameQuerierTestCase(unittest.TestCase):
     def test_async_query_retry_no_retry(self):
         d = succeed(u'精華')
         attrs = {'query_async.return_value': d}
         querier = Mock(**attrs)
-        retry = NameQueryRetry(querier)
+        retry = RetriedNameQuerier(querier)
         result = retry.query_async(u'1565.TWO', 3, 1, 10)
 
         self.assertEqual(result.result, u'精華')
@@ -183,7 +183,7 @@ class NameQueryRetryTestCase(unittest.TestCase):
         m1 = MagicMock(side_effect=[d1, d2])
         attrs = {'query_async': m1}
         querier = Mock(**attrs)
-        retry = NameQueryRetry(querier)
+        retry = RetriedNameQuerier(querier)
         result = retry.query_async(u'1565.TWO', 3, 1, 10)
 
         def asserts(r):

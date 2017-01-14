@@ -82,7 +82,7 @@ class NameQuerier(object):
         return response[name_start:name_end]
 
 
-class NameQueryRetry(object):
+class RetriedNameQuerier(object):
     def __init__(self, querier):
         self.querier = querier
 
