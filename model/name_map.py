@@ -10,9 +10,9 @@ class NameMapper(object):
 
     @inlineCallbacks
     def map_async(self, numbers, timeout):
-        def fill_name(name, i, num):
-            names[i] = name
-            self.name_repository.save_name(num, name)
+        def fill_name(result, index, num):
+            names[index] = result
+            self.name_repository.save_name(num, result)
 
         names = [None] * len(numbers)
         deferreds = []
