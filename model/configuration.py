@@ -143,3 +143,6 @@ class RepositoryConfigParser(object):
 
     def parse(self, config_obj):
         self.path = config_obj.get('Repository', 'path')
+
+
+__all__ = ['WatchConfigParser', 'WebConfigParser']

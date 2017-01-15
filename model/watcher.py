@@ -49,3 +49,6 @@ class _ConditionalStock(Stock):
     @property
     def high_price(self):
         return self.condition.high_price
+
+
+__all__ = ['Watcher']

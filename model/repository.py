@@ -33,3 +33,6 @@ class StockNameRepository(object):
         i = self.stocks.insert().values(number=number, name=name)
         conn.execute(i)
         conn.close()
+
+
+__all__ = ['StockNameRepository']

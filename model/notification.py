@@ -19,3 +19,6 @@ class Notifier(object):
         smtp_obj.login(smtp_confing.user, smtp_confing.password)
         smtp_obj.sendmail(smtp_confing.from_addr, to_addrs, msg.as_string())
         smtp_obj.quit()
+
+
+__all__ = ['Notifier']

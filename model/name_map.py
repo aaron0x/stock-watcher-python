@@ -34,3 +34,6 @@ class NameMapper(object):
         if deferreds:
             yield DeferredList(deferreds)
         returnValue(names)
+
+
+__all__ = ['NameMapper']
