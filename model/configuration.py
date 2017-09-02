@@ -14,7 +14,11 @@ class WatchConditionParser(object):
             num = s
             low = config_obj.getfloat(s, 'low')
             high = config_obj.getfloat(s, 'high')
-            self.watch_conditions.append(WatchCondition(num, low, high))
+            try:
+                skip_notif = config_obj.getboolean(s, 'skip_notif')
+                self.watch_conditions.append(WatchCondition(num, low, high, skip_notif))
+            except:
+                self.watch_conditions.append(WatchCondition(num, low, high, False))
 
 
 class LogConfigParser(object):
@@ -83,10 +87,11 @@ class WebConfigParser(object):
 
 
 class WatchCondition(object):
-    def __init__(self, number, low_price, high_price):
+    def __init__(self, number, low_price, high_price, skip_notif):
         self.number = number
         self.low_price = low_price
         self.high_price = high_price
+        self.skip_notif = skip_notif
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):

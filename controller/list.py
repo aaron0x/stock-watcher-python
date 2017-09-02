@@ -28,5 +28,5 @@ class ListStockController(object):
 
 class NamedWatchCondition(WatchCondition):
     def __init__(self, name, condition):
-        super(NamedWatchCondition, self).__init__(condition.number, condition.low_price, condition.high_price)
+        super(NamedWatchCondition, self).__init__(condition.number, condition.low_price, condition.high_price, condition.skip_notif)
         self.name = name
